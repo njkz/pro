@@ -14,7 +14,9 @@ import java.io.IOException;
 public class Proba extends JComponent {
 
     private BufferedImage image;
-    private int cadre = 0;
+
+    private Physics physics = new Physics();
+    private int dx = 0;
 
     public Proba() throws IOException {
         setPreferredSize(new Dimension(500, 500));
@@ -23,27 +25,33 @@ public class Proba extends JComponent {
         setFocusable(true);
         addKeyListener(new KeyAdapter() {
             public void keyPressed(KeyEvent e) {
-                if (e.getKeyCode() == KeyEvent.VK_SPACE) {
-                    cadre = (cadre + 1) % 6;
-                    repaint();
+                if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
+                    dx = 1;
+                }
+                else if (e.getKeyCode() == KeyEvent.VK_LEFT) {
+                    dx = -1;
                 }
             }
+
+            public void keyReleased(KeyEvent e) {
+                dx = 0;
+            }
         });
-//        new Timer(100, new ActionListener() {
-//            public void actionPerformed(ActionEvent e) {
-//                cadre = (cadre + 1) % 6;
-//                repaint();
-//            }
-//        }).start();
+        new Timer(200, new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                physics.update(dx);
+                repaint();
+            }
+        }).start();
     }
 
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        int x = getWidth() / 2 - 200;
+        int x = getWidth() / 2 - 200 + physics.getX();
         int y = getHeight() / 2 - 200;
-        BufferedImage subimage = image.getSubimage(cadre * 102, 0, 102, 150);
+        BufferedImage subimage = image.getSubimage(physics.getCadre() * 102, 0, 102, 150);
         g.drawImage(subimage, x, y, this);
     }
 
